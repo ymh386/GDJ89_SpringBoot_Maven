@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="com.moon.app.board.notice.NoticeDAO">
+  	<sql id="search">
+  		WHERE
+  			<choose>
+  				<when test="kind == 'k1'">
+  					BOARD_TITLE
+  				</when>
+  				
+  				<when test="kind=='k2'">
+  					BOARD_CONTENTS
+  				</when>
+  				<otherwise>
+  					USER_NAME
+  				</otherwise>
+  			</choose>
+  			LIKE CONCAT('%', #{search} , '%')
+  	</sql>
+  	
+  	<select id="getTotalCount" resultType="Long" parameterType="Pager">
+  		SELECT COUNT(BOARD_NUM) FROM NOTICE_TBL
+  		<include refid="search"></include>
+  	</select>
+  
+  	<select id="getList" resultType="NoticeVO" parameterType="Pager">
+	  	SELECT * FROM NOTICE_TBL
+  		
+  		<include refid="search"></include>
+  		
+  		ORDER BY BOARD_NUM DESC
+  		LIMIT #{startNum} , #{perPage}
+	  		
+  	</select>
+  	
+  	<select id="getDetail" resultMap="getDetailResult" parameterType="BoardVO">
+  		SELECT *
+  		FROM NOTICE_TBL
+  			LEFT OUTER JOIN
+  			NOTICE_FILES_TBL
+  			USING(BOARD_NUM)
+  		WHERE BOARD_NUM=#{boardNum}
+  	</select>
+  	
+  	<select id="getFileDetail" resultType="BoardFileVO" parameterType="BoardFileVO">
+  		SELECT * FROM NOTICE_FILES_TBL WHERE FILE_NUM = #{fileNum}
+  	</select>
+  	
+  	<resultMap type="NoticeVO" id="getDetailResult">
+  		<id column="BOARD_NUM" property="boardNum"/>
+  		<result column="BOARD_TITLE" property="boardTitle"/>
+  		<result column="BOARD_CONTENTS" property="boardContents"/>
+  		<result column="BOARD_DATE" property="boardDate"/>
+  		<result column="BOARD_HIT" property="boardHit"/>
+  		<result column="USER_NAME" property="userName"/>
+  		<collection javaType="java.util.List" ofType="BoardFileVO" property="boardFileVOs">
+  			<id column="FILE_NUM" property="fileNum"/>
+  			<result column="FILE_NAME" property="fileName"/>
+  			<result column="OLD_NAME" property="oldName"/>
+  		</collection>
+  	</resultMap>
+  	
+  	<insert id="add" parameterType="BoardVO" useGeneratedKeys="true" keyProperty="boardNum">
+  		INSERT INTO NOTICE_TBL 
+  		(BOARD_TITLE, BOARD_CONTENTS, BOARD_DATE, BOARD_HIT, USER_NAME)
+  		VALUES
+  		(#{boardTitle}, #{boardContents}, NOW(), 0, #{userName})
+  	</insert>
+  	
+  	<insert id="addFile" parameterType="BoardFileVO">
+  		INSERT INTO NOTICE_FILES_TBL
+  		(FILE_NAME, OLD_NAME, BOARD_NUM)
+  		VALUES
+  		(#{fileName}, #{oldName}, #{boardNum})
+  	</insert>
+  	
+  	<insert id="test" parameterType="java.util.List">
+  		<!-- 다중 insert -->
+  		
+  		INSERT 
+  		INTO NOTICE_TBL 
+  		(BOARD_TITLE, BOARD_CONTENTS, BOARD_DATE, BOARD_HIT, USER_NAME)
+  		VALUES 
+  		<foreach collection="list" item="item" open="" separator="," close="">
+  		(#{item.boardTitle}, #{item.boardContents}, NOW(), 0, #{item.userName})
+  		</foreach>
+  		
+  		
+  	</insert>
+  </mapper>
