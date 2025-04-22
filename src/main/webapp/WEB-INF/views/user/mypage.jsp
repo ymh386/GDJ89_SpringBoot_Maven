@@ -30,52 +30,21 @@
 			                                <h1 class="h4 text-gray-900 mb-4">Create an Account!</h1>
 			                            </div>
 			                            <form:form modelAttribute="userVO" cssClass="user" method="post" enctype="multipart/form-data">
-			                                <div class="form-group">
-			                                    <form:input cssClass="form-control form-control-user" id="username"
-			                                        path="username" placeholder="username"/>
-			                                </div>
-			                                <div>
-			                                	<form:errors path="username"></form:errors>
-			                                </div>
-
-			                                <div class="form-group row">
-			                                    <div class="col-sm-6 mb-3 mb-sm-0">
-			                                        <form:password cssClass="form-control form-control-user"
-			                                            id="password" path="password" placeholder="Password"/>
-			                                    </div>
-			                                    <div>
-			                                		<form:errors path="password"></form:errors>
-			                                	</div>
-			                                    <div class="col-sm-6">
-			                                        <form:password cssClass="form-control form-control-user"
-			                                            id="passwordCheck" path="passwordCheck" placeholder="Repeat Password"/>
-			                                    </div>
-			                                    <div>
-			                                		<form:errors path="passwordCheck"></form:errors>
-			                                	</div>
-
-			                                </div>
 			                                
 			                                <div class="form-group">
 			                                    <form:input cssClass="form-control form-control-user" id="name"
-			                                        path="name" placeholder="name"/>
-			                                </div>
-			                                <div>
-			                                	<form:errors path="name"></form:errors>
+			                                        path="name" value="${user.name}" placeholder="name"/>
 			                                </div>
 			                     
 			                                
 			                                <div class="form-group">
 			                                    <form:input cssClass="form-control form-control-user" id="phone"
-			                                        path="phone" placeholder="phone"/>
-			                                </div>
-			                                <div>
-			                                	<form:errors path="phone"></form:errors>
+			                                        path="phone" value="${user.phone}" placeholder="phone"/>
 			                                </div>		
 			                                
 			                                <div class="form-group">
 			                                    <form:input cssClass="form-control form-control-user" id="email"
-			                                        path="email" placeholder="email"/>
+			                                        path="email" value="${user.email}" placeholder="email"/>
 			                                </div>
 			                                <div>
 			                                	<form:errors path="email"></form:errors>
@@ -83,7 +52,7 @@
 			                                
 			                                <div class="form-group">
 			                                    <input type="date" class="form-control form-control-user" id="birth"
-			                                        name="birth">
+			                                        name="birth" value="${user.birth}">
 			                                </div>	
 			                                <div>
 			                                	<form:errors path="birth"></form:errors>
