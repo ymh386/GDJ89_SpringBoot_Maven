@@ -1,6 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -19,11 +21,19 @@
 				<c:import url="./templates/topbar.jsp"></c:import>
 				<div class="container-fluid">
 				<!-- contents 영역 -->
-				<h1>Home Gradle</h1>
-				<img alt="" src="/images/아미르.jpg">
-				
-			
+					<p>
+						<spring:message var="m" code="welcome"></spring:message>
+					</p>
+					<p>
+						<spring:message code="hello"></spring:message>
+					</p>
+					<p>
+						<spring:message code="hi" text="안녕하세요"></spring:message>
+					</p>
 					
+					<h3>${m}</h3>
+					
+					<spring.message code="welcome" arguments="${user.username},${user.name}" argumentSeparator=","></spring.message>
 				</div>
 			</div>
 			<!-- End of Main Content -->
