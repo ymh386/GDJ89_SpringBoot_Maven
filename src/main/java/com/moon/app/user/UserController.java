@@ -1,7 +1,13 @@
 package com.moon.app.user;
 
+import java.util.Enumeration;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
+
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -23,14 +30,9 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 	
-	@GetMapping("mypage")
-	public void mypage(@ModelAttribute UserVO userVO) throws Exception{
-		
-	}
-	
-	@PostMapping("mypage")
-	public void mypage(@Validated(UpdateGroup.class) UserVO userVO,BindingResult bindingResult) {
-		
+	@PostMapping("update")
+	public String update(@Validated(UpdateGroup.class) UserVO userVO,BindingResult bindingResult) {
+		return "redirect:/user/mypage";
 	}
 	
 	@GetMapping("join")
@@ -45,7 +47,7 @@ public class UserController {
 			return "user/join";
 		}
 		
-//		userService.join(userVO, avatar);
+		userService.join(userVO, avatar);
 		return "redirect:/";
 	}
 
@@ -53,21 +55,28 @@ public class UserController {
 	@GetMapping("login")
 	public void login()throws Exception{}
 	
-	@PostMapping("login")
-	public String login(UserVO userVO, HttpSession session)throws Exception{
-		
-		userVO =userService.detail(userVO);
-		if(userVO != null) {
-			session.setAttribute("user", userVO);
-		}
-		
-		return "redirect:/";
+//	@GetMapping("logout")
+//	public String login(HttpSession session)throws Exception{
+//		session.invalidate();
+//		return "redirect:/";
+//	}
+	
+	@GetMapping("myPage")
+	public String myPage(@ModelAttribute UserVO userVO, HttpSession session) throws Exception{
+//		Enumeration<String> e = session.getAttributeNames();
+//		while(e.hasMoreElements()) {
+//		}
+//		Object obj=session.getAttribute("SPRING_SECURITY_CONTEXT");
+//		SecurityContextImpl impl = (SecurityContextImpl)obj;
+//		
+//		Authentication authen = impl.getAuthentication();
+////		log.info("{}", authen.getPrincipal());
+		return "user/myPage";
 	}
 	
-	@GetMapping("logout")
-	public String login(HttpSession session)throws Exception{
-		session.invalidate();
-		return "redirect:/";
+	@GetMapping("update")
+	public String update(@ModelAttribute UserVO userVO) throws Exception{
+		return "user/update";
 	}
 
 }

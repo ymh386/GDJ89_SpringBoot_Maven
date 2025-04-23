@@ -89,9 +89,11 @@
 								  </ul>
 								</nav>							
 								
-								<div class="">
-									<a href="./add" class="btn btn-primary">글작성</a>
-								</div>
+								<sec:authorize access="hasRole('ADMIN')">
+									<div style="display: flex; justify-content: end;">
+										<a href="./add" class="btn btn-primary mb-2">글쓰기</a>
+									</div>
+								</sec:authorize>
 							</div>	
                         </div>
                     </div>

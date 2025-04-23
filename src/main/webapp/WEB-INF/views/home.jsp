@@ -2,6 +2,7 @@
     pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
 
 <!DOCTYPE html>
 <html>
@@ -21,6 +22,12 @@
 				<c:import url="./templates/topbar.jsp"></c:import>
 				<div class="container-fluid">
 				<!-- contents 영역 -->
+					<sec:authorize access="hasAnyRole('ADMIN', 'MANAGER')">
+						<h3>Admin View</h3>
+					</sec:authorize>
+					
+					
+					
 					<p>
 						<spring:message var="m" code="welcome"></spring:message>
 					</p>
@@ -33,7 +40,7 @@
 					
 					<h3>${m}</h3>
 					
-					<spring.message code="welcome" arguments="${user.username},${user.name}" argumentSeparator=","></spring.message>
+					<spring.message code="welcome.login" arguments="${user.username},${user.name}" argumentSeparator=","></spring.message>
 				</div>
 			</div>
 			<!-- End of Main Content -->
