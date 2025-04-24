@@ -16,6 +16,7 @@ import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 import com.moon.app.user.UserService;
+import com.moon.app.user.UserSocialService;
 
 @Configuration
 @EnableWebSecurity(debug = true)
@@ -29,6 +30,9 @@ public class SecurityConfig {
 	
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+	private UserSocialService userSocialService;
 	
 	@Bean
 	HttpFirewall firewall() {
@@ -99,6 +103,12 @@ public class SecurityConfig {
 				.maximumSessions(1)
 				.maxSessionsPreventsLogin(false)
 				.expiredUrl("/");
+			})
+			.oauth2Login(oauth2Login->{
+				oauth2Login
+				.userInfoEndpoint(use->{
+					use.userService(userSocialService);
+				});
 			})
 			;
 			
