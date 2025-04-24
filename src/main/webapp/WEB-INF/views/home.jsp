@@ -26,7 +26,9 @@
 						<h3>Admin View</h3>
 					</sec:authorize>
 					
-					
+					<sec:authorize access="isAuthenticated()">
+						<h3>USERNAME : <sec:authentication property="principal" var="user" /> </h3>
+					</sec:authorize>
 					
 					<p>
 						<spring:message var="m" code="welcome"></spring:message>

@@ -1,17 +1,30 @@
 package com.moon.app.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
 import org.springframework.security.web.firewall.HttpFirewall;
 
+import com.moon.app.user.UserService;
+
 @Configuration
 @EnableWebSecurity(debug = true)
 public class SecurityConfig {
+	
+	@Autowired
+	private SecurityLoginSuccessHandler loginSuccessHandler;
+	
+	@Autowired
+	private SecurityLoginFailHandler loginFailHandler;
+	
+	@Autowired
+	private UserService userService;
 	
 	@Bean
 	HttpFirewall firewall() {
@@ -51,8 +64,10 @@ public class SecurityConfig {
 				//파라미터 이름을 지정할 수 있음.
 				//.usernameParameter("userID")
 				//.passwordParameter("pw")
-				.defaultSuccessUrl("/")
-				.failureUrl("/user/login")
+				//.defaultSuccessUrl("/")
+				.successHandler(loginSuccessHandler)
+//				.failureUrl("/user/login")
+				.failureHandler(loginFailHandler)
 				.permitAll();
 			})
 			
@@ -64,7 +79,23 @@ public class SecurityConfig {
 				.invalidateHttpSession(true)
 				.permitAll();
 			})
-			
+			.rememberMe(rememberme->{
+				rememberme
+				.rememberMeParameter("remember-me")
+				.tokenValiditySeconds(60)
+				.key("rememberKey")
+				.userDetailsService(userService)
+				.authenticationSuccessHandler(loginSuccessHandler)
+				.useSecureCookie(false);
+			})
+			.sessionManagement(s->{
+				s
+				.sessionFixation().changeSessionId()
+				.invalidSessionUrl("/")
+				.maximumSessions(1)
+				.maxSessionsPreventsLogin(false)
+				.expiredUrl("/");
+			})
 			;
 			
 			

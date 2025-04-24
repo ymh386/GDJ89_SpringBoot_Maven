@@ -5,6 +5,7 @@ import java.util.Enumeration;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -53,7 +54,13 @@ public class UserController {
 
 	
 	@GetMapping("login")
-	public void login()throws Exception{}
+	public String login(@AuthenticationPrincipal UserVO userVO)throws Exception{
+		if(userVO != null) {
+			return "redirect:/";
+		}
+		
+		return "user/login";
+	}
 	
 //	@GetMapping("logout")
 //	public String login(HttpSession session)throws Exception{

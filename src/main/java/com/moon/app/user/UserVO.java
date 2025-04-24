@@ -45,6 +45,10 @@ public class UserVO implements UserDetails {
 	private Date birth;
 	private String fileName;
 	private String oriName;
+	private boolean accountNonExpired;
+	private boolean accountNonLocked;
+	private boolean credentialsNonExpired;
+	private boolean enabled;
 
 	private List<RoleVO> list;
 
@@ -59,30 +63,9 @@ public class UserVO implements UserDetails {
 		}
 		return ar;
 	}
-
-	@Override
-	public boolean isAccountNonExpired() {
-		// TODO Auto-generated method stub
-		return true;
-	}
-
-	@Override
-	public boolean isAccountNonLocked() {
-		// TODO Auto-generated method stub
-		return true;
-	}
-
-	@Override
-	public boolean isCredentialsNonExpired() {
-		// TODO Auto-generated method stub
-		return true;
-	}
-
-	@Override
-	public boolean isEnabled() {
-		// TODO Auto-generated method stub
-		return true;
-	}
+	
+	//비번이 틀린 경우
+	//BadCredentialsException: 자격 증명에 실패하였습니다.
 	
 	
 }
