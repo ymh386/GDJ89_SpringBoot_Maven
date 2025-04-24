@@ -27,6 +27,7 @@
 						</div>
 						<div class="card-body">
 						<form method="post" enctype="multipart/form-data">
+							<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
 						  <div class="form-group">
 						    <label for="user">User</label>
 						    <input type="text" name="userName" class="form-control" id="user" >
