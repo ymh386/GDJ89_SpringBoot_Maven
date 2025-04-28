@@ -51,8 +51,20 @@ public class UserVO implements UserDetails, OAuth2User {
 	private boolean accountNonLocked;
 	private boolean credentialsNonExpired;
 	private boolean enabled;
+	
+	//비번이 틀린 경우
+	//BadCredentialsException: 자격 증명에 실패하였습니다.
 
 	private List<RoleVO> list;
+	
+	/** oau2user **/
+	private Map<String, Object> attributes;
+	
+	private String accessToken;
+	
+	private String sns;
+	
+	/** oau2user **/
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -67,20 +79,10 @@ public class UserVO implements UserDetails, OAuth2User {
 	}
 
 	
-	//비번이 틀린 경우
-	//BadCredentialsException: 자격 증명에 실패하였습니다.
-	
-	
-	/** oau2user **/
-	private Map<String, Object> attributes;
-	
-	private String accessToken;
-	
-	private String sns;
+
 	
 	
 	
-	/** oau2user **/
 	
 	
 }

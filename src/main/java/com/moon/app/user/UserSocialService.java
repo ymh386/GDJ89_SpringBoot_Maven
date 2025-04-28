@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -17,6 +18,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UserSocialService extends DefaultOAuth2UserService {
 	
+	@Autowired
+	private UserDAO userDAO;
+	
 	@Override
 	public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
 		// TODO Auto-generated method stub
@@ -28,17 +32,21 @@ public class UserSocialService extends DefaultOAuth2UserService {
 		log.info("Token : {} ", userRequest.getAccessToken());
 		ClientRegistration registration = userRequest.getClientRegistration();
 		log.info("ID : {} ", registration.getRegistrationId());
-		
 		String sns = registration.getRegistrationId();
 		
 		if(sns.toUpperCase().equals("KAKAO")) {
-			return this.useKakao(userRequest);
+			try {
+				return this.useKakao(userRequest);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		return null;
 	}
 	
-	private OAuth2User useKakao(OAuth2UserRequest userRequest) {
+	private OAuth2User useKakao(OAuth2UserRequest userRequest) throws Exception {
 		OAuth2User user = super.loadUser(userRequest);
 		log.info("user : {} ", user);
 		log.info("ID : {} ", user.getName());
@@ -51,13 +59,21 @@ public class UserSocialService extends DefaultOAuth2UserService {
 		
 		UserVO userVO = new UserVO();
 		
-		userVO.setAttributes(user.getAttributes());
-		userVO.setUsername(attr.get("nickname").toString());
+		
+		userVO.setUsername(user.getName());
+		userVO.setName(attr.get("nickname").toString());
 		userVO.setFileName(attr.get("thumbnail_image").toString());
-		
-		userVO.setAccessToken(userRequest.getAccessToken().toString());
-		
 		userVO.setSns(userRequest.getClientRegistration().getRegistrationId());
+		
+		UserVO userVO2 = userDAO.detail(userVO);
+		
+		if(userVO2 == null) {
+			userDAO.join(userVO);
+		}
+		
+		userVO.setUsername(attr.get("nickname").toString());
+		userVO.setAttributes(user.getAttributes());
+		userVO.setAccessToken(userRequest.getAccessToken().toString());
 		
 		List<RoleVO> list = new ArrayList<>();
 		RoleVO roleVO = new RoleVO();

@@ -7,9 +7,9 @@
   
   	<insert id="join" parameterType="UserVO">
   		INSERT INTO USER_TBL
-  		(USERNAME, PASSWORD,NAME, PHONE, EMAIL, BIRTH, FILE_NAME, ORI_NAME)
+  		(USERNAME, PASSWORD,NAME, PHONE, EMAIL, BIRTH, FILE_NAME, ORI_NAME, SNS)
   		VALUES
-  		(#{username}, #{password},#{name}, #{phone}, #{email}, #{birth}, #{fileName}, #{oriName})
+  		(#{username}, #{password},#{name}, #{phone}, #{email}, #{birth}, #{fileName}, #{oriName}, #{sns})
   	</insert>
   	
   	<select id="detail" parameterType="UserVO" resultMap="detailResult">

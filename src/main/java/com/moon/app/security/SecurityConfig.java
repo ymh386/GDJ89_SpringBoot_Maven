@@ -34,6 +34,12 @@ public class SecurityConfig {
 	@Autowired
 	private UserSocialService userSocialService;
 	
+	@Autowired
+	private SecurityLogoutHandler securityLogoutHandler;
+	
+	@Autowired
+	private SecurityLogoutSuccessHandler logoutSuccessHandler;
+	
 	@Bean
 	HttpFirewall firewall() {
 		return new DefaultHttpFirewall();
@@ -83,7 +89,9 @@ public class SecurityConfig {
 			.logout(logout ->{
 				logout
 				.logoutUrl("/user/logout")
-				.logoutSuccessUrl("/")
+//				.logoutSuccessUrl("/")
+				.addLogoutHandler(securityLogoutHandler)
+				//.logoutSuccessHandler(logoutSuccessHandler)
 				.invalidateHttpSession(true)
 				.permitAll();
 			})
