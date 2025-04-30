@@ -18,5 +18,6 @@ public class MessageVO {
 	
 	//0->전체, 1->1:1
 	private String status;
+	private boolean readStatus;
 
 }

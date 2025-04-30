@@ -33,10 +33,15 @@ public class ChatService {
 		if(list.size()==0) {
 			Calendar calendar = Calendar.getInstance();
 			messageVO.setRoomNum(calendar.getTimeInMillis());
+			messageVO.setStatus("1");
 			chatDAO.addChat(messageVO);
 			list = chatDAO.room(messageVO);
 		}
 		return list;
+	}
+	
+	public int updateReadStatus(MessageVO messageVO) throws Exception {
+		return chatDAO.updateReadStatus(messageVO);
 	}
 
 }

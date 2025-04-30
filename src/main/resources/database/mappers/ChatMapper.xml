@@ -5,12 +5,24 @@
   
   <mapper namespace="com.moon.app.websocket.ChatDAO">
   
+  	<!-- Memo SELECT -->
+  	
+  	
+  	<select id="getMemoList" parameterType="MessageVO" resultType="MessageVO">
+  		SELECT * FROM CHAT_TBL
+  		WHERE RECEIVER=#{receiver} AND STATUS='3' AND READ_STATUS=0
+  		ORDER BY CHAT_NUM DESC
+  	</select>
+  	
+  
   	<select id="room" parameterType="MessageVO" resultType="MessageVO">
   		SELECT * FROM CHAT_TBL
   		WHERE
   			SENDER=#{sender} AND RECEIVER=#{receiver}
   			OR
   			SENDER=#{receiver} AND RECEIVER=#{sender}
+  			AND
+  			STATUS=1
   		ORDER BY CHAT_TIME ASC
   	</select>
   
@@ -20,19 +32,23 @@
   	
   	<insert id="addChat" parameterType="MessageVO">
   		INSERT INTO CHAT_TBL VALUES
-  		(NULL, #{roomNum}, #{sender}, #{receiver}, #{body}, now())
+  		(NULL, #{roomNum}, #{sender}, #{receiver}, #{body}, now(), #{status}, 0)
   	</insert>
   	
   	<insert id="add" parameterType="java.util.List">
   		INSERT INTO CHAT_TBL
   		(
-  			CHAT_NUM, ROOM_NUM, SENDER, RECEIVER, BODY, CHAT_TIME
+  			CHAT_NUM, ROOM_NUM, SENDER, RECEIVER, BODY, CHAT_TIME, STATUS
   		)
   		VALUES
   		<foreach item="vo" collection="list" separator=",">
-  			(NULL, #{vo.roomNum}, #{vo.sender}, #{vo.receiver}, #{vo.body}, now())
+  			(NULL, #{vo.roomNum}, #{vo.sender}, #{vo.receiver}, #{vo.body}, now(), #{vo.status})
   		</foreach>
   	</insert>
+  	
+  	<update id="updateReadStatus" parameterType="MessageVO">
+  		UPDATE CHAT_TBL SET READ_STATUS=1 WHERE CHAT_NUM=#{chatNum}
+  	</update>
   	
   	
   </mapper>
