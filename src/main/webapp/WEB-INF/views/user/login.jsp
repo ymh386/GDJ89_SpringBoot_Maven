@@ -30,7 +30,7 @@
 			                                <h1 class="h4 text-gray-900 mb-4">Create an Account!</h1>
 			                                <h3><spring:message code="${param.message}" text=""></spring:message></h3>
 			                            </div>
-			                            <form class="user" method="post" enctype="multipart/form-data">
+			                            <form class="user" action="/users/login" method="post" enctype="multipart/form-data">
 			                            	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}">
 			                            
 			                                <div class="form-group">
