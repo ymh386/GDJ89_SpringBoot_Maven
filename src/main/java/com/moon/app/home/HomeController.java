@@ -29,6 +29,11 @@ public class HomeController {
 			session.setAttribute("memoList", list);
 			session.setAttribute("readCount", list.size());
 		}
+		
+//		if(userVO == null) {
+//			throw new NullPointerException();
+//		}
+		
 		return "home";
 	}
 
