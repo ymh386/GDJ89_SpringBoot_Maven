@@ -4,10 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.SecurityFilterChain;
@@ -15,6 +18,9 @@ import org.springframework.security.web.firewall.DefaultHttpFirewall;
 import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
 
+import com.moon.app.security.jwt.JwtAuthenticationFilter;
+import com.moon.app.security.jwt.JwtLoginFilter;
+import com.moon.app.security.jwt.JwtTokenManager;
 import com.moon.app.user.UserService;
 import com.moon.app.user.UserSocialService;
 
@@ -23,22 +29,9 @@ import com.moon.app.user.UserSocialService;
 public class SecurityConfig {
 	
 	@Autowired
-	private SecurityLoginSuccessHandler loginSuccessHandler;
-	
+	private AuthenticationConfiguration authenticationConfiguration;
 	@Autowired
-	private SecurityLoginFailHandler loginFailHandler;
-	
-	@Autowired
-	private UserService userService;
-	
-	@Autowired
-	private UserSocialService userSocialService;
-	
-	@Autowired
-	private SecurityLogoutHandler securityLogoutHandler;
-	
-	@Autowired
-	private SecurityLogoutSuccessHandler logoutSuccessHandler;
+	private JwtTokenManager jwtTokenManager;
 	
 	@Bean
 	HttpFirewall firewall() {
@@ -46,6 +39,7 @@ public class SecurityConfig {
 	}
 	
 	//정적 자원들을 Securuty에서 제외
+	//.anyRequest().permitAll(); 권장
 		@Bean
 		WebSecurityCustomizer custom() {
 			
@@ -72,52 +66,27 @@ public class SecurityConfig {
 			})
 			
 			//Form 관련 설정
-			.formLogin(formLogin ->{
-				formLogin
-				.loginPage("/user/login")
-				//파라미터 이름을 지정할 수 있음.
-				//.usernameParameter("userID")
-				//.passwordParameter("pw")
-				//.defaultSuccessUrl("/")
-				.successHandler(loginSuccessHandler)
-//				.failureUrl("/user/login")
-				.failureHandler(loginFailHandler)
-				.permitAll();
+			.formLogin(formLogin -> formLogin.disable())
+			/**
+			 * Session 인증 방식이 아닌
+			 * Token 기반 인증 방식을 사용 하기 때문에
+			 * Session을 사용 하지 않음
+			 * 클라이언트에서 Token값을 서버에 전달 하지 않더라도 로그인 됨
+			 */
+			.sessionManagement(session ->{
+				session.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 			})
 			
-			//Logout 관련 설정
-			.logout(logout ->{
-				logout
-				.logoutUrl("/user/logout")
-//				.logoutSuccessUrl("/")
-				.addLogoutHandler(securityLogoutHandler)
-				//.logoutSuccessHandler(logoutSuccessHandler)
-				.invalidateHttpSession(true)
-				.permitAll();
-			})
-			.rememberMe(rememberme->{
-				rememberme
-				.rememberMeParameter("remember-me")
-				.tokenValiditySeconds(60)
-				.key("rememberKey")
-				.userDetailsService(userService)
-				.authenticationSuccessHandler(loginSuccessHandler)
-				.useSecureCookie(false);
-			})
-			.sessionManagement(s->{
-				s
-				.sessionFixation().changeSessionId()
-				.invalidSessionUrl("/")
-				.maximumSessions(1)
-				.maxSessionsPreventsLogin(false)
-				.expiredUrl("/");
-			})
-			.oauth2Login(oauth2Login->{
-				oauth2Login
-				.userInfoEndpoint(use->{
-					use.userService(userSocialService);
-				});
-			})
+			/**
+			 * 쿠키와 세션을 이용하는 방식이 아니라
+			 * Request Header에 ID, PW를 직접 보내는 방식이라 보안에 취약
+			 * HTTPBasic방식은 해제
+			 */
+			.httpBasic(httpBasic -> httpBasic.disable())
+			
+			.addFilter(new JwtLoginFilter(authenticationConfiguration.getAuthenticationManager(), jwtTokenManager))
+			.addFilter(new JwtAuthenticationFilter(authenticationConfiguration.getAuthenticationManager(), jwtTokenManager))
+			
 			;
 			
 			
