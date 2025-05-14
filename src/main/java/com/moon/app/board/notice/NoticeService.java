@@ -70,6 +70,16 @@ public class NoticeService implements BoardService {
 	}
 	
 	@Override
+	public int update(BoardVO boardVO) throws Exception {
+		return noticeDAO.update(boardVO);
+	}
+	
+	@Override
+	public int delete(BoardVO boardVO) throws Exception {
+		return noticeDAO.delete(boardVO);
+	}
+	
+	@Override
 	public BoardFileVO getFileDetail(BoardFileVO boardFileVO) throws Exception {
 		return noticeDAO.getFileDetail(boardFileVO);
 	}

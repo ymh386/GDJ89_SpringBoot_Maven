@@ -1,17 +1,23 @@
 package com.moon.app.board.notice;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.moon.app.board.BoardFileVO;
@@ -23,8 +29,8 @@ import lombok.extern.slf4j.Slf4j;
 
 
 @Slf4j
-@Controller
-@RequestMapping("/notice/*")
+@RestController
+//@RequestMapping("/notice/*")
 public class NoticeController {
 	
 	@Autowired
@@ -37,44 +43,73 @@ public class NoticeController {
 		return this.name;
 	}
 
-	@GetMapping("list")
-	public String getList(Pager pager, Model model) throws Exception {
-		
+//	@GetMapping("list")
+	@GetMapping("/notices")
+	public Map<String, Object> getList(Pager pager, Model model) throws Exception {
+		pager.setKind("k1");
 		List<BoardVO> ar = noticeService.getList(pager);
 		model.addAttribute("list", ar);
 		model.addAttribute("pager", pager);
 		
-		return "board/list";
+		Map<String, Object> map = new HashMap<>();
+		map.put("ar", ar);
+		map.put("pager", pager);
+		
+		return map;
 	}
 	
-	@GetMapping("detail")
-	public String getDetail(BoardVO boardVO, Model model)throws Exception{
+//	@GetMapping("detail")
+	@GetMapping("/notices/{page}")
+	public BoardVO getDetail(@PathVariable(name = "page") Long page)throws Exception{
+		BoardVO boardVO = new BoardVO();
+		boardVO.setBoardNum(page);
+		
 		boardVO = noticeService.getDetail(boardVO);
 		
 		if(boardVO == null) {
 			
 		}
 		
-		model.addAttribute("vo", boardVO);
-		
-		return "board/detail";
+		return boardVO;
 	}
 	
-	@GetMapping("add")
-	public String add()throws Exception{
-		return "board/add";
-	}
+//	@PostMapping("/notices/")
+//	public String add()throws Exception{
+//		return "board/add";
+//	}
 	
-	@PostMapping("add")
-	public String add(NoticeVO noticeVO, @RequestParam(name = "attaches") MultipartFile[] attaches, @AuthenticationPrincipal UserVO userVO) throws Exception{
+	@PostMapping("/notices")
+	public int add(NoticeVO noticeVO, @RequestParam(name = "attaches") MultipartFile[] attaches) throws Exception{
+		log.info("NoticeVO : {}", noticeVO);
+		for(MultipartFile m : attaches) {
+			log.info("fileName : {}", m.getOriginalFilename());
+		}
 		
-		noticeVO.setUserName(userVO.getUsername());
+		
+//		noticeVO.setUserName(userVO.getUsername());
 		
 		int result = noticeService.add(noticeVO, attaches);
 		
 		
 		
-		return "redirect:./list";
+		return result;
+	}
+	
+	@DeleteMapping("/notices/{boardNum}")
+	public int delete(@PathVariable(name = "boardNum") Long boardNum) throws Exception {
+		BoardVO boardVO = new BoardVO();
+		boardVO.setBoardNum(boardNum);
+		
+		int result = noticeService.delete(boardVO);
+		
+		return result;
+	}
+	
+	@PatchMapping("/notices")
+	public int update(NoticeVO noticeVO) throws Exception {
+		int result = noticeService.update(noticeVO);
+		
+		return result;
 	}
 	
 	@GetMapping("fileDown")

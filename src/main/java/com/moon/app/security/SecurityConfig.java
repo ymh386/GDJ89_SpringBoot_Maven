@@ -1,5 +1,7 @@
 package com.moon.app.security;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -14,6 +16,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
 import org.springframework.security.web.firewall.HttpFirewall;
 import org.springframework.security.web.session.HttpSessionEventPublisher;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.moon.app.user.UserService;
 import com.moon.app.user.UserSocialService;
@@ -60,14 +65,14 @@ public class SecurityConfig {
 			
 			//다른 서버에서 오는 것을 허용
 			//CORS 허용, Filter에서 사용 가능
-			security.cors(cors-> cors.disable())
+			security.cors(cors-> cors.configurationSource(this.corsConfigurationSource()))
 			.csrf(csrf-> csrf.disable())
 			//권한 적용
 			.authorizeHttpRequests(authorizeRequest->{
 				authorizeRequest
-				.requestMatchers("/notice/add", "/notice/update", "/notice/delete").hasRole("ADMIN")
-				.requestMatchers("/user/myPage", "/user/update", "/user/logout").authenticated()
-				.requestMatchers("/manager/**").hasAnyRole("ADMIN", "MANAGER")
+//				.requestMatchers("/notice/add", "/notice/update", "/notice/delete").hasRole("ADMIN")
+//				.requestMatchers("/user/myPage", "/user/update", "/user/logout").authenticated()
+//				.requestMatchers("/manager/**").hasAnyRole("ADMIN", "MANAGER")
 				.anyRequest().permitAll();
 			})
 			
@@ -122,6 +127,20 @@ public class SecurityConfig {
 			
 			
 			return security.build();
+		}
+		
+		CorsConfigurationSource corsConfigurationSource() {
+			CorsConfiguration corsConfiguration = new CorsConfiguration();
+			
+			//GET메서드 허용
+			corsConfiguration.setAllowedOrigins(List.of("*"));
+			
+			//추가 메서드 허용
+			corsConfiguration.setAllowedMethods(List.of("POST", "DELETE", "PATCH" ,"PUT", "GET"));
+			
+			UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+			source.registerCorsConfiguration("/**", corsConfiguration);
+			return source;
 		}
 
 }
