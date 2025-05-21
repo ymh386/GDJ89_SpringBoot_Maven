@@ -8,6 +8,7 @@
 <meta charset="UTF-8">
 <title>Insert title here</title>
 <c:import url="/WEB-INF/views/templates/header.jsp"></c:import>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js" integrity="sha512-1QvjE7BtotQjkq8PxLeF6P46gEpBRXuskzIVgjFpekzFVF4yjRgrQvTG1MTOJ3yQgvTteKAcO7DSZI92+u/yZw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body id="page-top">
 	<div id="wrapper">
@@ -61,7 +62,7 @@
 
 	
 	
-	<c:import url="/WEB-INF/views/templates/footer.jsp"></c:import>
+	
 	<!-- Chat Modal -->
 	<sec:authentication property="name" var="username" />
 	<div class="modal" tabindex="-1" id="chat" data-sender-name="${username}">
@@ -88,6 +89,14 @@
 	    </div>
 	  </div>
 	</div>
+	
+	<c:import url="/WEB-INF/views/templates/footer.jsp"></c:import>
+	<script type="text/javascript">
+		const socket = new SockJS("/ws/chat")
+		socket.onopen=function(){
+			console.log("jsp socket 연결 성공")
+		}
+	</script>
 	
 	
 	<script src="/js/chat/chat.js"></script>	

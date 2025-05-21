@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
+import * as usermanager from '../../commons/UserManager';
 
 function Detail(){
     // 파라미터 : URL/파라미터값/파라미터값
@@ -43,7 +44,9 @@ function Detail(){
             let params = new URLSearchParams();
             params.append('boardNum', query.get('boardNum'))
     
-            fetch(`http://localhost:81/notices/${p.state.boardNum}`)
+            fetch(`http://localhost:81/notices/${p.state.boardNum}`, {
+                headers:usermanager.setHeaders()
+            })
             .then(r=>r.json())
             .then(r=>{
                 console.log(r)
@@ -54,9 +57,7 @@ function Detail(){
     function deleteHandler(){
         fetch(`http://localhost:81/notices/${p.state.boardNum}`, {
             method:'DELETE',
-            headers:{
-
-            }
+            headers:usermanager.setHeaders()    
         })
         .then(r=>r.json())
         .then(r=>{

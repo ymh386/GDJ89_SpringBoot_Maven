@@ -91,7 +91,7 @@
   		
   	</insert>
   	
-  	<update id="update" parameterType="NoticeVO">
+  		<update id="update" parameterType="NoticeVO">
   			UPDATE NOTICE_TBL SET BOARD_TITLE=#{boardTitle}, BOARD_CONTENTS=#{boardContents} WHERE BOARD_NUM=#{boardNum}
   		</update>
   		

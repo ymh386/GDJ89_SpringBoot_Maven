@@ -12,15 +12,17 @@ public class WebSocketConfig implements WebSocketConfigurer {
 	
 	@Autowired
 	private ChatHandler chatHandler;
-	
+
 	@Override
 	public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
 		// TODO Auto-generated method stub
-		System.out.println("========= CHat Handler ========");
 		registry
 		.addHandler(chatHandler, "/ws/chat")
-//		.withSockJS()  ws프로토콜을 사용하지 못할 때 http프로토콜로 우회시켜 주는것
-		.setAllowedOrigins("*");
+		.setAllowedOriginPatterns("http://localhost:5173", "http://localhost:5173/ws/chat")
+		.withSockJS();  //ws프로토콜을 사용하지 못할 때 http프로토콜로 우회시켜 주는것
+		
 	}
+	
+	
 
 }

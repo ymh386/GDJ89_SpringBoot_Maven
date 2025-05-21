@@ -85,7 +85,7 @@ public class UserService implements UserDetailsService{
 		UserVO result = userDAO.detail(userVO);
 		if(result != null) {
 			if(userVO.getPassword().equals(result.getPassword())) {
-				return userVO;
+				return result;
 			}
 			result = null;
 		}

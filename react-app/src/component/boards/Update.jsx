@@ -61,12 +61,12 @@ export default function Update(){
                     <label htmlFor="contents">내용</label>
                     <textarea id="contents" defaultValue={detail.boardContents} name="boardContents"></textarea>
                 </div>
-                {/* <div>
+                <div>
                     <label>첨부 파일</label><br/>
                     <input type="file" name="attaches"></input><br/>
                     <input type="file" name="attaches"></input><br/>
                     <input type="file" name="attaches"></input><br/>
-                </div> */}
+                </div>
                 <button type="submit" >글 수정</button>
             </form>
         </>

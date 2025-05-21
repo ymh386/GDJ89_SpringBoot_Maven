@@ -3,19 +3,16 @@ package com.moon.app.security;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.servlet.ServletListenerRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
-import org.springframework.security.core.session.SessionRegistry;
-import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.firewall.DefaultHttpFirewall;
 import org.springframework.security.web.firewall.HttpFirewall;
-import org.springframework.security.web.session.HttpSessionEventPublisher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -27,11 +24,7 @@ import com.moon.app.user.UserSocialService;
 @EnableWebSecurity(debug = true)
 public class SecurityConfig {
 	
-	@Autowired
-	private SecurityLoginSuccessHandler loginSuccessHandler;
 	
-	@Autowired
-	private SecurityLoginFailHandler loginFailHandler;
 	
 	@Autowired
 	private UserService userService;
@@ -40,10 +33,9 @@ public class SecurityConfig {
 	private UserSocialService userSocialService;
 	
 	@Autowired
-	private SecurityLogoutHandler securityLogoutHandler;
-	
+	private AuthenticationConfiguration authenticationConfiguration;
 	@Autowired
-	private SecurityLogoutSuccessHandler logoutSuccessHandler;
+	private JwtTokenManager jwtTokenManager;
 	
 	@Bean
 	HttpFirewall firewall() {
@@ -78,51 +70,30 @@ public class SecurityConfig {
 			
 			//Form 관련 설정
 			.formLogin(formLogin ->{
-				formLogin
-				.loginPage("/user/login")
-				//파라미터 이름을 지정할 수 있음.
-				//.usernameParameter("userID")
-				//.passwordParameter("pw")
-				//.defaultSuccessUrl("/")
-				.successHandler(loginSuccessHandler)
-//				.failureUrl("/user/login")
-				.failureHandler(loginFailHandler)
-				.permitAll();
-			})
-			
-			//Logout 관련 설정
-			.logout(logout ->{
-				logout
-				.logoutUrl("/user/logout")
-//				.logoutSuccessUrl("/")
-				.addLogoutHandler(securityLogoutHandler)
-				//.logoutSuccessHandler(logoutSuccessHandler)
-				.invalidateHttpSession(true)
-				.permitAll();
-			})
-			.rememberMe(rememberme->{
-				rememberme
-				.rememberMeParameter("remember-me")
-				.tokenValiditySeconds(60)
-				.key("rememberKey")
-				.userDetailsService(userService)
-				.authenticationSuccessHandler(loginSuccessHandler)
-				.useSecureCookie(false);
+				formLogin.disable()
+				
+				;
 			})
 			.sessionManagement(s->{
-				s
-				.sessionFixation().changeSessionId()
-				.invalidSessionUrl("/")
-				.maximumSessions(1)
-				.maxSessionsPreventsLogin(false)
-				.expiredUrl("/");
+				s.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+				
+				;
 			})
-			.oauth2Login(oauth2Login->{
-				oauth2Login
-				.userInfoEndpoint(use->{
-					use.userService(userSocialService);
-				});
-			})
+			.httpBasic(httpBasic-> httpBasic.disable())
+			
+			
+			
+			
+			
+//			.oauth2Login(oauth2Login->{
+//				oauth2Login
+//				.userInfoEndpoint(use->{
+//					use.userService(userSocialService);
+//				});
+//			})
+			
+			.addFilter(new JwtAuthenticationFilter(authenticationConfiguration.getAuthenticationManager(), jwtTokenManager))
+			.addFilter(new JwtLoginFilter(authenticationConfiguration.getAuthenticationManager(), jwtTokenManager))
 			;
 			
 			
@@ -133,10 +104,15 @@ public class SecurityConfig {
 			CorsConfiguration corsConfiguration = new CorsConfiguration();
 			
 			//GET메서드 허용
-			corsConfiguration.setAllowedOrigins(List.of("*"));
+			corsConfiguration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5173/ws/chat"));
 			
+			//corsConfiguration.setAllowedOrigins(List.of("*"));
+			//corsConfiguration.setAllowCredentials(true);
 			//추가 메서드 허용
 			corsConfiguration.setAllowedMethods(List.of("POST", "DELETE", "PATCH" ,"PUT", "GET"));
+			
+			corsConfiguration.setAllowedHeaders(List.of("*"));
+			corsConfiguration.setExposedHeaders(List.of("Authorization", "AccessToken", "RefreshToken"));
 			
 			UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 			source.registerCorsConfiguration("/**", corsConfiguration);

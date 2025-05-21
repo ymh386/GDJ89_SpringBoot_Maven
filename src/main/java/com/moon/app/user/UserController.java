@@ -82,8 +82,19 @@ public class UserController {
 	}
 	
 	@GetMapping("update")
-	public String update(@ModelAttribute UserVO userVO) throws Exception{
-		return "user/update";
+	public void update(@ModelAttribute UserVO userVO, HttpSession session) throws Exception{
+		Enumeration<String> e = session.getAttributeNames();
+		while(e.hasMoreElements()) {
+			System.out.println(e.nextElement());
+		}
+		
+		Object obj = session.getAttribute("SPRING_SECURITY_CONTEXT");
+		System.out.println(obj.getClass());
+		
+		SecurityContextImpl impl =(SecurityContextImpl)obj;
+		
+		Authentication authentication= impl.getAuthentication();
+		log.info("authentication: {}", authentication);;
 	}
 
 }
